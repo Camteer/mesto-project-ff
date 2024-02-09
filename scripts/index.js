@@ -15,17 +15,17 @@ function handleDeleteCard (element) {
   element.target.parentElement.remove();
 }
 
-function addCard(element, def) {
+function addCard(data, onDelete) {
   const cardTemplate = document.querySelector('#card-template').content;
   const cardElement = cardTemplate.querySelector('.places__item').cloneNode(true);
-  cardElement.querySelector('.card__image').setAttribute('src', element.link);
-  cardElement.querySelector('.card__image').setAttribute('alt', `Картинка местности ${element.name}`)
-  cardElement.querySelector('.card__title').textContent = element.name;
+  cardElement.querySelector('.card__image').setAttribute('src', data.link);
+  cardElement.querySelector('.card__image').setAttribute('alt', `Картинка местности ${data.name}`)
+  cardElement.querySelector('.card__title').textContent = data.name;
   
-  cardElement.querySelector('.card__delete-button').addEventListener('click', def);
-  return cardsContainer.append(cardElement);
+  cardElement.querySelector('.card__delete-button').addEventListener('click', onDelete);
+  return cardElement
 };
 
 initialCards.forEach(function (element) {
-  addCard(element, handleDeleteCard)
+  cardsContainer.append(addCard(element, handleDeleteCard));
 });
