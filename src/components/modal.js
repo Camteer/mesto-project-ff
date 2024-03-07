@@ -81,7 +81,7 @@ function initCards(element) {
       cardsContainer.append(addCard(element, handleDeleteCard, handleLikeCard));
     })
     .catch(() => {
-      console.log("Ошибка");
+      alert("Ошибка ссылки");
     });
 }
 
@@ -100,7 +100,7 @@ function handleFormCard(evt) {
       cardsContainer.prepend(addCard(data, handleDeleteCard, handleLikeCard));
     })
     .catch(() => {
-      console.log("Ошибка");
+      alert("Ошибка ссылки");
     });
 
   closeModal(evt);
