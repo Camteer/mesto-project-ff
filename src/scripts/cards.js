@@ -1,5 +1,3 @@
-
-
 const initialCards = [
   {
     name: "Архыз",
@@ -35,40 +33,20 @@ function handleLikeCard(element) {
   element.target.classList.toggle("card__like-button_is-active");
 }
 
-function getImage(url){
-  return new Promise(function(resolve, reject){
-      let img = new Image();
-      img.onload = function(){
-          resolve(url);
-      };
-      img.onerror = function(){
-          reject(url);
-      };
-      img.src = url;
-  });
-}
-
-
 function addCard(data, onDelete, onLike) {
   const cardTemplate = document.querySelector("#card-template").content;
   const cardElement = cardTemplate.querySelector(".places__item").cloneNode(true);
   cardElement.querySelector(".card__image").setAttribute("src", data.link);
   cardElement.querySelector(".card__image").setAttribute("alt", `Картинка местности ${data.name}`);
   cardElement.querySelector(".card__title").textContent = data.name;
-
   cardElement.querySelector(".card__delete-button").addEventListener("click", onDelete);
   cardElement.querySelector(".card__like-button").addEventListener("click", onLike);
-  
   return cardElement
 }
-
-
-
 
 export { 
   initialCards, 
   addCard, 
   handleDeleteCard, 
-  handleLikeCard, 
-  getImage 
+  handleLikeCard 
 };

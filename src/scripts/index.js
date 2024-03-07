@@ -11,11 +11,7 @@
 import "../pages/index.css";
 
 import {
-  initialCards,
-  addCard,
-  handleDeleteCard,
-  handleLikeCard,
-  getImage
+  initialCards
 } from "./cards.js";
 
 import {
@@ -23,6 +19,7 @@ import {
   handleFormCard,
   openModal,
   closeModal,
+  initCards
 } from "../components/modal.js";
 
 const avatar = new URL("../images/avatar.jpg", import.meta.url);
@@ -49,10 +46,10 @@ const nameInput = document.querySelector(".profile__title");
 const jobInput = document.querySelector(".profile__description");
 
 // Попапы
+
 const popupEdit = document.querySelector(".popup_type_edit");
 const popupAddCard = document.querySelector(".popup_type_new-card");
 const popupCard = document.querySelector(".popup_type_image");
-
 
 // Инициализация
 
@@ -62,16 +59,8 @@ const popupCard = document.querySelector(".popup_type_image");
   popupEdit.classList.add("popup_is-animated");
   popupAddCard.classList.add("popup_is-animated");
   popupCard.classList.add("popup_is-animated");
-  initialCards.forEach(function (element) {
-    getImage(element.link)
-    .then(() => {
-      cardsContainer.append(addCard(element, handleDeleteCard, handleLikeCard));})
-    .catch(()=>{
-      console.log("Ошибка");
-    });
-  });
+  initialCards.forEach(initCards);
 })();
-
 
 // Cлушатели
 

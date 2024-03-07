@@ -9,12 +9,7 @@ import {
   cardsContainer,
 } from "../scripts/index.js";
 
-import {
-    addCard, 
-    handleDeleteCard, 
-    handleLikeCard, 
-    getImage 
-} from "../scripts/cards.js";
+import { addCard, handleDeleteCard, handleLikeCard } from "../scripts/cards.js";
 
 // Функции открытия окна
 
@@ -63,9 +58,34 @@ function handleFormSubmit(evt) {
   closeModal(evt);
 }
 
+// Функция проверки ссылки
+
+function getImage(url) {
+  return new Promise(function (resolve, reject) {
+    let img = new Image();
+    img.onload = function () {
+      resolve(url);
+    };
+    img.onerror = function () {
+      reject(url);
+    };
+    img.src = url;
+  });
+}
+
+// Функция создание первых 6 карт
+
+function initCards(element) {
+  getImage(element.link)
+    .then(() => {
+      cardsContainer.append(addCard(element, handleDeleteCard, handleLikeCard));
+    })
+    .catch(() => {
+      console.log("Ошибка");
+    });
+}
+
 // Функция возврата карты
-
-
 
 function handleFormCard(evt) {
   evt.preventDefault();
@@ -77,11 +97,12 @@ function handleFormCard(evt) {
   };
   getImage(data.link)
     .then(() => {
-      cardsContainer.append(addCard(data, handleDeleteCard, handleLikeCard));})
-    .catch(()=>{
-      console.log("Ошибка");
+      cardsContainer.prepend(addCard(data, handleDeleteCard, handleLikeCard));
     })
-  
+    .catch(() => {
+      console.log("Ошибка");
+    });
+
   closeModal(evt);
   formCard["place-name"].value = "";
   formCard["link"].value = "";
@@ -122,9 +143,4 @@ function closeModal(evt) {
   }
 }
 
-export { 
-    handleFormSubmit, 
-    handleFormCard, 
-    openModal, 
-    closeModal 
-};
+export { handleFormSubmit, handleFormCard, openModal, closeModal, initCards };
