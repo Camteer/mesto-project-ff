@@ -1,3 +1,4 @@
+import { openPopup } from "../components/modal.js";
 const initialCards = [
   {
     name: "Архыз",
@@ -25,28 +26,47 @@ const initialCards = [
   },
 ];
 
+const popupCard = document.querySelector(".popup_type_image");
+
 function handleDeleteCard(element) {
   element.target.parentElement.remove();
+}
+
+function handleImageClick(evt) {
+  popupCard.querySelector(".popup__image").setAttribute("src", evt.target.src);
+  popupCard.querySelector(".popup__caption").textContent = evt.target
+    .closest(".card")
+    .querySelector(".card__title").textContent;
+  openPopup(popupCard);
 }
 
 function handleLikeCard(element) {
   element.target.classList.toggle("card__like-button_is-active");
 }
 
-function addCard(data, onDelete, onLike) {
+function addCard(data, onDelete, onLike, onImage) {
   const cardTemplate = document.querySelector("#card-template").content;
-  const cardElement = cardTemplate.querySelector(".places__item").cloneNode(true);
-  cardElement.querySelector(".card__image").setAttribute("src", data.link);
-  cardElement.querySelector(".card__image").setAttribute("alt", `Картинка местности ${data.name}`);
-  cardElement.querySelector(".card__title").textContent = data.name;
-  cardElement.querySelector(".card__delete-button").addEventListener("click", onDelete);
-  cardElement.querySelector(".card__like-button").addEventListener("click", onLike);
-  return cardElement
+  const cardElement = cardTemplate
+    .querySelector(".places__item")
+    .cloneNode(true);
+  const cardElementImage = cardElement.querySelector(".card__image");
+  const cardElementTitle = cardElement.querySelector(".card__title");
+  const cardElementDelete = cardElement.querySelector(".card__delete-button");
+  const cardElementLike = cardElement.querySelector(".card__like-button");
+  cardElementImage.setAttribute("src", data.link);
+  cardElementImage.setAttribute("alt", `Картинка местности ${data.name}`);
+  cardElementTitle.textContent = data.name;
+  cardElementDelete.addEventListener("click", onDelete);
+  cardElementLike.addEventListener("click", onLike);
+  cardElementImage.addEventListener("click", onImage);
+  return cardElement;
 }
 
-export { 
-  initialCards, 
-  addCard, 
-  handleDeleteCard, 
-  handleLikeCard 
+export {
+  initialCards,
+  addCard,
+  handleDeleteCard,
+  handleLikeCard,
+  handleImageClick,
+  popupCard,
 };

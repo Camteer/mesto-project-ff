@@ -1,52 +1,41 @@
 import {
-  formEdit,
-  formCard,
-  nameInput,
-  jobInput,
-  popupEdit,
-  popupAddCard,
-  popupCard,
-  cardsContainer,
-} from "../scripts/index.js";
+  addCard,
+  handleDeleteCard,
+  handleLikeCard,
+  handleImageClick,
+} from "../scripts/cards.js";
 
-import { addCard, handleDeleteCard, handleLikeCard } from "../scripts/cards.js";
+// Контейнер карточек
+
+const cardsContainer = document.querySelector(".places__list");
+
+// Формы
+
+const formEdit = document.forms["edit-profile"];
+const formCard = document.forms["new-place"];
+
+// Эдиты
+
+const nameInput = document.querySelector(".profile__title");
+const jobInput = document.querySelector(".profile__description");
 
 // Функции открытия окна
 
-function openModal(evt) {
-  switch (evt.target.classList.value) {
-    case "profile__edit-button":
-      openEdit(popupEdit);
-      break;
-    case "profile__add-button":
-      openAddCard(popupAddCard);
-      break;
-    case "card__image":
-      openCard(evt, popupCard);
-      break;
+function openPopup(popup) {
+  popup.classList.add("popup_is-opened");
+  document.addEventListener("keydown", handleEscape);
+}
+
+function closePopup(popup) {
+  popup.classList.remove("popup_is-opened");
+  document.removeEventListener("keydown", handleEscape);
+}
+
+function handleEscape(evt) {
+  if (evt.key === "Escape") {
+    const popupOpened = document.querySelector(".popup_is-opened");
+    closePopup(popupOpened);
   }
-}
-
-function openEdit(divPopup) {
-  divPopup.classList.add("popup_is-opened");
-  formEdit.name.value = nameInput.textContent;
-  formEdit.description.value = jobInput.textContent;
-  divPopup.addEventListener("click", closeModal);
-}
-
-function openAddCard(divPopup) {
-  divPopup.classList.add("popup_is-opened");
-  divPopup.addEventListener("click", closeModal);
-}
-
-function openCard(evt, divPopup) {
-  divPopup.classList.add("popup_is-opened");
-  let image = document.querySelector(".popup__image");
-  let caption = document.querySelector(".popup__caption");
-  image.src = evt.target.src;
-  caption.textContent =
-    evt.target.parentElement.querySelector(".card__title").textContent;
-  divPopup.addEventListener("click", closeModal);
 }
 
 // Функция возврата формы
@@ -55,14 +44,16 @@ function handleFormSubmit(evt) {
   evt.preventDefault();
   nameInput.textContent = formEdit.name.value;
   jobInput.textContent = formEdit.description.value;
-  closeModal(evt);
+  formEdit.name.value = nameInput.textContent;
+  formEdit.description.value = jobInput.textContent;
+  closePopup(evt.target.closest(".popup"));
 }
 
 // Функция проверки ссылки
 
 function getImage(url) {
   return new Promise(function (resolve, reject) {
-    let img = new Image();
+    const img = new Image();
     img.onload = function () {
       resolve(url);
     };
@@ -78,7 +69,9 @@ function getImage(url) {
 function initCards(element) {
   getImage(element.link)
     .then(() => {
-      cardsContainer.append(addCard(element, handleDeleteCard, handleLikeCard));
+      cardsContainer.append(
+        addCard(element, handleDeleteCard, handleLikeCard, handleImageClick)
+      );
     })
     .catch(() => {
       console.log("Ошибка");
@@ -89,58 +82,51 @@ function initCards(element) {
 
 function handleFormCard(evt) {
   evt.preventDefault();
-  let name = formCard["place-name"].value;
-  let link = formCard["link"].value;
+  const name = formCard["place-name"].value;
+  const link = formCard["link"].value;
   const data = {
     name,
     link,
   };
   getImage(data.link)
     .then(() => {
-      cardsContainer.prepend(addCard(data, handleDeleteCard, handleLikeCard));
+      cardsContainer.prepend(
+        addCard(data, handleDeleteCard, handleLikeCard, handleImageClick)
+      );
     })
     .catch(() => {
       console.log("Ошибка");
     });
 
-  closeModal(evt);
-  formCard["place-name"].value = "";
-  formCard["link"].value = "";
+  closePopup(evt.target.closest(".popup"));
+  formCard.reset();
 }
 
 // Функция закрытия
 
-function closeModal(evt) {
-  let divPopup;
-
-  switch (evt.type) {
-    case "submit": // Закрытие по сабмит
-      divPopup = evt.target.parentElement.parentElement;
-      divPopup.classList.remove("popup_is-opened");
-      divPopup.removeEventListener("click", closeModal);
-      break;
-
-    case "click": // Закрытие по оверлею  и крестику
-      if (evt.target.classList.contains("popup")) {
-        divPopup = evt.target;
-        divPopup.classList.remove("popup_is-opened");
-        divPopup.removeEventListener("click", closeModal);
-        break;
-      } else if (evt.target.classList.contains("popup__close")) {
-        divPopup = evt.target.parentElement.parentElement;
-        divPopup.classList.remove("popup_is-opened");
-        divPopup.removeEventListener("click", closeModal);
-        break;
+function closeModal() {
+  const popups = document.querySelectorAll(".popup");
+  popups.forEach((popup) => {
+    popup.addEventListener("mousedown", (evt) => {
+      if (evt.target.classList.contains("popup_is-opened")) {
+        closePopup(popup);
       }
-  }
-
-  if (evt.key === "Escape") {
-    try {
-      const popupOpened = document.querySelector(".popup_is-opened");
-      popupOpened.classList.remove("popup_is-opened");
-      popupOpened.removeEventListener("click", closeModal);
-    } catch {}
-  }
+      if (evt.target.classList.contains("popup__close")) {
+        closePopup(popup);
+      }
+    });
+  });
 }
 
-export { handleFormSubmit, handleFormCard, openModal, closeModal, initCards };
+export {
+  handleFormSubmit,
+  handleFormCard,
+  openPopup,
+  closeModal,
+  initCards,
+  formEdit,
+  formCard,
+  nameInput,
+  jobInput,
+  cardsContainer,
+};
