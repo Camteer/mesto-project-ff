@@ -1,24 +1,3 @@
-import {
-  addCard,
-  handleDeleteCard,
-  handleLikeCard,
-  handleImageClick,
-} from "../scripts/cards.js";
-
-// Контейнер карточек
-
-const cardsContainer = document.querySelector(".places__list");
-
-// Формы
-
-const formEdit = document.forms["edit-profile"];
-const formCard = document.forms["new-place"];
-
-// Эдиты
-
-const nameInput = document.querySelector(".profile__title");
-const jobInput = document.querySelector(".profile__description");
-
 // Функции открытия окна
 
 function openPopup(popup) {
@@ -26,10 +5,14 @@ function openPopup(popup) {
   document.addEventListener("keydown", handleEscape);
 }
 
+// Функции закрытия окна
+
 function closePopup(popup) {
   popup.classList.remove("popup_is-opened");
   document.removeEventListener("keydown", handleEscape);
 }
+
+// Функции закрытия окна esc
 
 function handleEscape(evt) {
   if (evt.key === "Escape") {
@@ -38,75 +21,12 @@ function handleEscape(evt) {
   }
 }
 
-// Функция возврата формы
-
-function handleFormSubmit(evt) {
-  evt.preventDefault();
-  nameInput.textContent = formEdit.name.value;
-  jobInput.textContent = formEdit.description.value;
-  formEdit.name.value = nameInput.textContent;
-  formEdit.description.value = jobInput.textContent;
-  closePopup(evt.target.closest(".popup"));
-}
-
-// Функция проверки ссылки
-
-function getImage(url) {
-  return new Promise(function (resolve, reject) {
-    const img = new Image();
-    img.onload = function () {
-      resolve(url);
-    };
-    img.onerror = function () {
-      reject(url);
-    };
-    img.src = url;
-  });
-}
-
-// Функция создание первых 6 карт
-
-function initCards(element) {
-  getImage(element.link)
-    .then(() => {
-      cardsContainer.append(
-        addCard(element, handleDeleteCard, handleLikeCard, handleImageClick)
-      );
-    })
-    .catch(() => {
-      alert("Ошибка ссылки");
-    });
-}
-
-// Функция возврата карты
-
-function handleFormCard(evt) {
-  evt.preventDefault();
-  const name = formCard["place-name"].value;
-  const link = formCard["link"].value;
-  const data = {
-    name,
-    link,
-  };
-  getImage(data.link)
-    .then(() => {
-      cardsContainer.prepend(
-        addCard(data, handleDeleteCard, handleLikeCard, handleImageClick)
-      );
-    })
-    .catch(() => {
-      alert("Ошибка ссылки");
-    });
-
-  closePopup(evt.target.closest(".popup"));
-  formCard.reset();
-}
-
 // Функция закрытия
 
-function closeModal() {
+function setCloseHandlers() {
   const popups = document.querySelectorAll(".popup");
   popups.forEach((popup) => {
+    popup.classList.add("popup_is-animated");
     popup.addEventListener("mousedown", (evt) => {
       if (evt.target.classList.contains("popup_is-opened")) {
         closePopup(popup);
@@ -119,14 +39,7 @@ function closeModal() {
 }
 
 export {
-  handleFormSubmit,
-  handleFormCard,
+  closePopup,
   openPopup,
-  closeModal,
-  initCards,
-  formEdit,
-  formCard,
-  nameInput,
-  jobInput,
-  cardsContainer,
+  setCloseHandlers,
 };
