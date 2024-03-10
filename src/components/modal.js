@@ -1,24 +1,3 @@
-import {
-  addCard,
-  handleDeleteCard,
-  handleLikeCard,
-  handleImageClick,
-} from "../scripts/cards.js";
-
-// Контейнер карточек
-
-const cardsContainer = document.querySelector(".places__list");
-
-// Формы
-
-const formEdit = document.forms["edit-profile"];
-const formCard = document.forms["new-place"];
-
-// Эдиты
-
-const nameInput = document.querySelector(".profile__title");
-const jobInput = document.querySelector(".profile__description");
-
 // Функции открытия окна
 
 function openPopup(popup) {
@@ -26,10 +5,14 @@ function openPopup(popup) {
   document.addEventListener("keydown", handleEscape);
 }
 
+// Функции закрытия окна
+
 function closePopup(popup) {
   popup.classList.remove("popup_is-opened");
   document.removeEventListener("keydown", handleEscape);
 }
+
+// Функции закрытия окна esc
 
 function handleEscape(evt) {
   if (evt.key === "Escape") {
@@ -74,7 +57,7 @@ function initCards(element) {
       );
     })
     .catch(() => {
-      alert("Ошибка ссылки");
+      console.log("Ошибка");
     });
 }
 
@@ -95,7 +78,7 @@ function handleFormCard(evt) {
       );
     })
     .catch(() => {
-      alert("Ошибка ссылки");
+      console.log("Ошибка");
     });
 
   closePopup(evt.target.closest(".popup"));
@@ -104,9 +87,10 @@ function handleFormCard(evt) {
 
 // Функция закрытия
 
-function closeModal() {
+function setCloseHandlers() {
   const popups = document.querySelectorAll(".popup");
   popups.forEach((popup) => {
+    popup.classList.add("popup_is-animated");
     popup.addEventListener("mousedown", (evt) => {
       if (evt.target.classList.contains("popup_is-opened")) {
         closePopup(popup);
@@ -119,14 +103,7 @@ function closeModal() {
 }
 
 export {
-  handleFormSubmit,
-  handleFormCard,
+  closePopup,
   openPopup,
-  closeModal,
-  initCards,
-  formEdit,
-  formCard,
-  nameInput,
-  jobInput,
-  cardsContainer,
+  setCloseHandlers,
 };

@@ -1,4 +1,3 @@
-import { openPopup } from "../components/modal.js";
 const initialCards = [
   {
     name: "Архыз",
@@ -26,18 +25,8 @@ const initialCards = [
   },
 ];
 
-const popupCard = document.querySelector(".popup_type_image");
-
 function handleDeleteCard(element) {
-  element.target.parentElement.remove();
-}
-
-function handleImageClick(evt) {
-  popupCard.querySelector(".popup__image").setAttribute("src", evt.target.src);
-  popupCard.querySelector(".popup__caption").textContent = evt.target
-    .closest(".card")
-    .querySelector(".card__title").textContent;
-  openPopup(popupCard);
+  element.target.closest('.card').remove();
 }
 
 function handleLikeCard(element) {
@@ -46,9 +35,7 @@ function handleLikeCard(element) {
 
 function addCard(data, onDelete, onLike, onImage) {
   const cardTemplate = document.querySelector("#card-template").content;
-  const cardElement = cardTemplate
-    .querySelector(".places__item")
-    .cloneNode(true);
+  const cardElement = cardTemplate.querySelector(".places__item").cloneNode(true);
   const cardElementImage = cardElement.querySelector(".card__image");
   const cardElementTitle = cardElement.querySelector(".card__title");
   const cardElementDelete = cardElement.querySelector(".card__delete-button");
@@ -58,7 +45,7 @@ function addCard(data, onDelete, onLike, onImage) {
   cardElementTitle.textContent = data.name;
   cardElementDelete.addEventListener("click", onDelete);
   cardElementLike.addEventListener("click", onLike);
-  cardElementImage.addEventListener("click", onImage);
+  cardElementImage.addEventListener("click", () => onImage(data));
   return cardElement;
 }
 
@@ -66,7 +53,5 @@ export {
   initialCards,
   addCard,
   handleDeleteCard,
-  handleLikeCard,
-  handleImageClick,
-  popupCard,
+  handleLikeCard
 };
