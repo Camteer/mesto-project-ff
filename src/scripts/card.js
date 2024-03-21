@@ -1,29 +1,34 @@
-import { deleteCard, putLike, statusLike } from "./api.js";
+import { deleteCard, putLike } from "./api.js";
 
 function handleDeleteCard(element, id) {
-  element.target.closest(".card").remove();
-  deleteCard(id);
+  deleteCard(id).then((res) => {
+    if (res.ok) {
+      element.target.closest(".card").remove();
+    }
+  });
 }
 
 function handleLikeCard(element, id, counter) {
   const likeButtom = element.target;
-  if (likeButtom.classList.contains("card__like-button_is-active")) {
-    putLike(id, "DELETE").then((res) => {
+  const likeMethod = likeButtom.classList.contains(
+    "card__like-button_is-active"
+  )
+    ? "DELETE"
+    : "PUT";
+
+  putLike(id, likeMethod)
+    .then((res) => {
       if (res.ok) {
-        statusLike(id, counter);
+        return res.json();
       }
+    })
+    .then((res) => {
+      counter.textContent = res.likes.length;
+      element.target.classList.toggle("card__like-button_is-active");
     });
-  } else {
-    putLike(id, "PUT").then((res) => {
-      if (res.ok) {
-        statusLike(id, counter);
-      }
-    });
-  }
-  element.target.classList.toggle("card__like-button_is-active");
 }
 
-function addCard(data, onDelete, onLike, onImage, myId) {
+function createCard(data, onDelete, onLike, onImage, myId) {
   const cardTemplate = document.querySelector("#card-template").content;
   const cardElement = cardTemplate
     .querySelector(".places__item")
@@ -36,19 +41,16 @@ function addCard(data, onDelete, onLike, onImage, myId) {
   cardElementImage.setAttribute("src", data.link);
   cardElementImage.setAttribute("alt", `Картинка местности ${data.name}`);
   cardElementTitle.textContent = data.name;
-  data.likes.forEach((element) => {
-    if (element._id === myId) {
-      cardElementLike.classList.add("card__like-button_is-active");
-    }
-  });
+  if (data.likes.some(element => element._id === myId)) { 
+    cardElementLike.classList.add("card__like-button_is-active"); 
+  }
   counter.textContent = data.likes.length;
-  
   cardElementLike.addEventListener("click", (evt) => {
     onLike(evt, data._id, counter);
   });
   cardElementImage.addEventListener("click", () => onImage(data));
   if (data.owner._id !== myId) {
-    cardElement.querySelector(".card__delete-button").remove();
+    cardElementDelete.remove();
   } else {
     cardElementDelete.addEventListener("click", (evt) => {
       onDelete(evt, data._id);
@@ -58,4 +60,4 @@ function addCard(data, onDelete, onLike, onImage, myId) {
   return cardElement;
 }
 
-export { addCard, handleDeleteCard, handleLikeCard };
+export { createCard, handleDeleteCard, handleLikeCard };

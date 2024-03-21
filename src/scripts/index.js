@@ -10,7 +10,7 @@
 
 import "../pages/index.css";
 
-import { handleDeleteCard, handleLikeCard, addCard } from "./cards.js";
+import { handleDeleteCard, handleLikeCard, createCard } from "./card.js";
 
 import {
   openPopup,
@@ -20,14 +20,7 @@ import {
 
 import { enableValidation, clearValidation } from "../components/validation.js";
 
-import {
-  takeInfo,
-  saveInfo,
-  setCard,
-  saveAvatar,
-  myId,
-  cardFromSercer,
-} from "./api.js";
+import { saveInfo, setCard, saveAvatar, getCards, getInfo } from "./api.js";
 
 const settingsValidation = {
   formSelector: ".popup__form",
@@ -85,16 +78,16 @@ function getImage(url) {
   });
 }
 
-function safelyLoad(array, flag = false) {
+function safelyLoad(array) {
   return Promise.all(array).then((res) => {
     const data = res[0];
-    const id = res[1];
-    if (!flag) {
+    const id = res[1]._id;
+    if (Array.isArray(data)) {
       data.forEach((element) => {
         getImage(element.link)
           .then(() => {
             cardsContainer.append(
-              addCard(
+              createCard(
                 element,
                 handleDeleteCard,
                 handleLikeCard,
@@ -108,22 +101,24 @@ function safelyLoad(array, flag = false) {
           });
       });
     } else {
-      getImage(res[0][0].link)
-        .then(() => {
-          cardsContainer.prepend(
-            addCard(
-              res[0][0],
-              handleDeleteCard,
-              handleLikeCard,
-              handleImageClick,
-              id
-            )
-          );
-        })
-        .catch((err) => {
-          console.log(err);
-        });
+      getImage(data.link)
+          .then(() => {
+            cardsContainer.prepend(
+              createCard(
+                data,
+                handleDeleteCard,
+                handleLikeCard,
+                handleImageClick,
+                id
+              )
+            );
+          })
+          .catch((err) => {
+            console.log(err);
+          });
     }
+    
+    
   });
 }
 
@@ -131,19 +126,27 @@ function safelyLoad(array, flag = false) {
 
 function handleProfileFormSubmit(evt) {
   evt.preventDefault();
-  nameInput.textContent = formEdit.name.value;
-  jobInput.textContent = formEdit.description.value;
   const load = evt.target.querySelector(".popup__button");
   load.textContent = "Сохранение...";
-  saveInfo(nameInput.textContent, jobInput.textContent).then((res) => {
+  saveInfo(formEdit.name.value, formEdit.description.value).then((res) => {
     if (res.ok) {
       load.textContent = "Сохранить";
+      return res.json()
     }
+  })
+  .then((res) => {
+    nameInput.textContent = res.name;
+    jobInput.textContent = res.about
   });
   clearValidation(evt.target, settingsValidation);
   closePopup(evt.target.closest(".popup"));
-  
 }
+
+getInfo().then((data) => {
+  nameInput.textContent = data.name;
+  jobInput.textContent = data.about;
+  avatarButton.setAttribute("style", `background-image: url(${data.avatar})`);
+});
 
 //
 
@@ -157,13 +160,15 @@ function handleImageClick(data) {
 function handleAvatarSubmit(evt) {
   evt.preventDefault();
   const link = formAvatar["link"].value;
-  avatarButton.setAttribute("style", `background-image: url(${link})`);
   const load = evt.target.querySelector(".popup__button");
   load.textContent = "Сохранение...";
   saveAvatar(link).then((res) => {
     if (res.ok) {
       load.textContent = "Сохранить";
+      return res.json()
     }
+  }).then((res) => {
+    avatarButton.setAttribute("style", `background-image: url(${res.avatar})`);
   });
   clearValidation(evt.target, settingsValidation);
   closePopup(evt.target.closest(".popup"));
@@ -181,14 +186,18 @@ function handleCardFormSubmit(evt) {
     link,
   };
   load.textContent = "Сохранение...";
-  setCard(data.name, data.link).then((res) => {
-    if (res.ok) {
-      safelyLoad([cardFromSercer(), myId()], true);
-      closePopup(evt.target.closest(".popup"));
-      load.textContent = "Сохранить";
-    }
-  });
-
+  setCard(data.name, data.link)
+    .then((res) => {
+      if (res.ok) {
+        
+        closePopup(evt.target.closest(".popup"));
+        load.textContent = "Сохранить";
+        return res.json()
+      }
+    })
+    .then((card) => {
+      safelyLoad([card, getInfo()]);
+    });
   clearValidation(evt.target, settingsValidation);
 }
 
@@ -196,9 +205,8 @@ function handleCardFormSubmit(evt) {
 
 (function () {
   document.querySelector(".logo").setAttribute("src", logo);
-  takeInfo(nameInput, jobInput, avatarButton);
   document.querySelector(".logo").setAttribute("src", logo);
-  safelyLoad([cardFromSercer(), myId()]);
+  safelyLoad([getCards(), getInfo()]);
   enableValidation(settingsValidation);
   setCloseHandlers();
 })();
@@ -213,18 +221,15 @@ editButton.addEventListener("click", () => {
   formEdit.name.value = nameInput.textContent;
   formEdit.description.value = jobInput.textContent;
   openPopup(profileForm);
-  
 });
 
 avatarButton.addEventListener("click", () => {
   formAvatar.reset();
   openPopup(popupAvatar);
   clearValidation(popupAvatar, settingsValidation);
-  
 });
 addCardButton.addEventListener("click", () => {
-  formCard.reset()
+  formCard.reset();
   openPopup(popupAddCard);
   clearValidation(popupAddCard, settingsValidation);
-  
 });
