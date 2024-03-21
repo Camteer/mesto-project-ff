@@ -1,3 +1,5 @@
+import { clearValidation } from "../components/validation.js";
+
 // Функции открытия окна
 
 function openPopup(popup) {
@@ -28,18 +30,12 @@ function setCloseHandlers() {
   popups.forEach((popup) => {
     popup.classList.add("popup_is-animated");
     popup.addEventListener("mousedown", (evt) => {
-      if (evt.target.classList.contains("popup_is-opened")) {
+      if (evt.target.classList.contains("popup_is-opened") || evt.target.classList.contains("popup__close")) {
         closePopup(popup);
-      }
-      if (evt.target.classList.contains("popup__close")) {
-        closePopup(popup);
+        clearValidation(popup.querySelector('.popup__form'))
       }
     });
   });
 }
 
-export {
-  closePopup,
-  openPopup,
-  setCloseHandlers,
-};
+export { closePopup, openPopup, setCloseHandlers };
