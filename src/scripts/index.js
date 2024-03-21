@@ -81,7 +81,6 @@ function getImage(url) {
 function safelyLoad(array) {
   return Promise.all(array).then((res) => {
     const data = res[0];
-    console.log(data);
     const id = res[1]._id;
     if (Array.isArray(data)) {
       data.forEach((element) => {

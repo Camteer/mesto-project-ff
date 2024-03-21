@@ -58,7 +58,6 @@ function createCard(data, onDelete, onLike, onImage, myId) {
       onDelete(evt, data._id);
     });
   }
-
   return cardElement;
 }
 
