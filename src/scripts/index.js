@@ -81,6 +81,7 @@ function getImage(url) {
 function safelyLoad(array) {
   return Promise.all(array).then((res) => {
     const data = res[0];
+    console.log(data);
     const id = res[1]._id;
     if (Array.isArray(data)) {
       data.forEach((element) => {
@@ -102,23 +103,21 @@ function safelyLoad(array) {
       });
     } else {
       getImage(data.link)
-          .then(() => {
-            cardsContainer.prepend(
-              createCard(
-                data,
-                handleDeleteCard,
-                handleLikeCard,
-                handleImageClick,
-                id
-              )
-            );
-          })
-          .catch((err) => {
-            console.log(err);
-          });
+        .then(() => {
+          cardsContainer.prepend(
+            createCard(
+              data,
+              handleDeleteCard,
+              handleLikeCard,
+              handleImageClick,
+              id
+            )
+          );
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     }
-    
-    
   });
 }
 
@@ -128,25 +127,30 @@ function handleProfileFormSubmit(evt) {
   evt.preventDefault();
   const load = evt.target.querySelector(".popup__button");
   load.textContent = "Сохранение...";
-  saveInfo(formEdit.name.value, formEdit.description.value).then((res) => {
-    if (res.ok) {
+  saveInfo(formEdit.name.value, formEdit.description.value)
+    .then((res) => {
+      nameInput.textContent = res.name;
+      jobInput.textContent = res.about;
+    })
+    .catch((err) => {
+      console.log(err);
+    })
+    .finally(() => {
       load.textContent = "Сохранить";
-      return res.json()
-    }
-  })
-  .then((res) => {
-    nameInput.textContent = res.name;
-    jobInput.textContent = res.about
-  });
-  clearValidation(evt.target, settingsValidation);
-  closePopup(evt.target.closest(".popup"));
+      closePopup(evt.target.closest(".popup"));
+      clearValidation(evt.target, settingsValidation);
+    });
 }
 
-getInfo().then((data) => {
-  nameInput.textContent = data.name;
-  jobInput.textContent = data.about;
-  avatarButton.setAttribute("style", `background-image: url(${data.avatar})`);
-});
+getInfo()
+  .then((data) => {
+    nameInput.textContent = data.name;
+    jobInput.textContent = data.about;
+    avatarButton.setAttribute("style", `background-image: url(${data.avatar})`);
+  })
+  .catch((err) => {
+    console.log(err);
+  });
 
 //
 
@@ -162,16 +166,21 @@ function handleAvatarSubmit(evt) {
   const link = formAvatar["link"].value;
   const load = evt.target.querySelector(".popup__button");
   load.textContent = "Сохранение...";
-  saveAvatar(link).then((res) => {
-    if (res.ok) {
+  saveAvatar(link)
+    .then((res) => {
+      avatarButton.setAttribute(
+        "style",
+        `background-image: url(${res.avatar})`
+      );
+    })
+    .catch((err) => {
+      console.log(err);
+    })
+    .finally(() => {
       load.textContent = "Сохранить";
-      return res.json()
-    }
-  }).then((res) => {
-    avatarButton.setAttribute("style", `background-image: url(${res.avatar})`);
-  });
-  clearValidation(evt.target, settingsValidation);
-  closePopup(evt.target.closest(".popup"));
+      clearValidation(evt.target, settingsValidation);
+      closePopup(evt.target.closest(".popup"));
+    });
 }
 
 // Функция возврата карты
@@ -187,26 +196,26 @@ function handleCardFormSubmit(evt) {
   };
   load.textContent = "Сохранение...";
   setCard(data.name, data.link)
-    .then((res) => {
-      if (res.ok) {
-        
-        closePopup(evt.target.closest(".popup"));
-        load.textContent = "Сохранить";
-        return res.json()
-      }
-    })
     .then((card) => {
       safelyLoad([card, getInfo()]);
+    })
+    .catch((err) => {
+      console.log("Ошибка", err);
+    })
+    .finally(() => {
+      load.textContent = "Сохранить";
+      closePopup(evt.target.closest(".popup"));
+      clearValidation(evt.target, settingsValidation);
     });
-  clearValidation(evt.target, settingsValidation);
 }
 
 // Инициализация
 
 (function () {
   document.querySelector(".logo").setAttribute("src", logo);
-  document.querySelector(".logo").setAttribute("src", logo);
-  safelyLoad([getCards(), getInfo()]);
+  safelyLoad([getCards(), getInfo()]).catch((err) => {
+    console.log("Ошибка", err);
+  });
   enableValidation(settingsValidation);
   setCloseHandlers();
 })();

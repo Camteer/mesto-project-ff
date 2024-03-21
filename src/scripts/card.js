@@ -1,11 +1,15 @@
 import { deleteCard, putLike } from "./api.js";
 
 function handleDeleteCard(element, id) {
-  deleteCard(id).then((res) => {
-    if (res.ok) {
-      element.target.closest(".card").remove();
-    }
-  });
+  deleteCard(id)
+    .then((res) => {
+      if (res) {
+        element.target.closest(".card").remove();
+      }
+    })
+    .catch((err) => {
+      console.log(err);
+    });
 }
 
 function handleLikeCard(element, id, counter) {
@@ -18,13 +22,11 @@ function handleLikeCard(element, id, counter) {
 
   putLike(id, likeMethod)
     .then((res) => {
-      if (res.ok) {
-        return res.json();
-      }
-    })
-    .then((res) => {
       counter.textContent = res.likes.length;
       element.target.classList.toggle("card__like-button_is-active");
+    })
+    .catch((err) => {
+      console.log(err);
     });
 }
 
@@ -41,8 +43,8 @@ function createCard(data, onDelete, onLike, onImage, myId) {
   cardElementImage.setAttribute("src", data.link);
   cardElementImage.setAttribute("alt", `Картинка местности ${data.name}`);
   cardElementTitle.textContent = data.name;
-  if (data.likes.some(element => element._id === myId)) { 
-    cardElementLike.classList.add("card__like-button_is-active"); 
+  if (data.likes.some((element) => element._id === myId)) {
+    cardElementLike.classList.add("card__like-button_is-active");
   }
   counter.textContent = data.likes.length;
   cardElementLike.addEventListener("click", (evt) => {
