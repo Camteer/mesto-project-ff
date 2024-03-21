@@ -35,7 +35,9 @@ function setCloseHandlers() {
         evt.target.classList.contains("popup__close")
       ) {
         closePopup(popup);
-        clearValidation(popup.querySelector(".popup__form"));
+        if (!popup.classList.contains('popup_type_image')) {
+          clearValidation(popup.querySelector(".popup__form"));
+        }
       }
     });
   });

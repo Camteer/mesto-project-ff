@@ -122,7 +122,6 @@ function safelyLoad(array, flag = false) {
 
 function handleProfileFormSubmit(evt) {
   evt.preventDefault();
-  console.log(evt.target);
   nameInput.textContent = formEdit.name.value;
   jobInput.textContent = formEdit.description.value;
   const load = evt.target.querySelector(".popup__button");

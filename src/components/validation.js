@@ -76,7 +76,6 @@ const enableValidation = (settings = settingsValidation) => {
     document.querySelectorAll(settings.formSelector)
   );
   arrayForm.forEach((formElement) => {
-    //console.log(formElement);
     setEventListeners(formElement, settings);
   });
 };

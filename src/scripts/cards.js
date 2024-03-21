@@ -7,7 +7,6 @@ function handleDeleteCard(element, id) {
 
 function handleLikeCard(element, id, counter) {
   const likeButtom = element.target;
-  console.log(likeButtom);
   if (likeButtom.classList.contains("card__like-button_is-active")) {
     putLike(id, "DELETE").then((res) => {
       if (res.ok) {
