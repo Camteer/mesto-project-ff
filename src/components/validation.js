@@ -56,7 +56,6 @@ const hasInvalidInput = (inputList) => {
 };
 
 const setEventListeners = (formElement, settings) => {
-  console.log(formElement)
   const inputList = Array.from(
     formElement.querySelectorAll(settings.inputSelector)
   );
@@ -83,6 +82,9 @@ const enableValidation = (settings = settingsValidation) => {
 };
 
 const clearValidation = (formElement, settings = settingsValidation) => {
+  if (formElement.getAttribute("name") !== "edit-profile") {
+    formElement.reset();
+  }
   const inputList = Array.from(
     formElement.querySelectorAll(settings.inputSelector)
   );

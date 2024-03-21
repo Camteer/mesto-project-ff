@@ -43,15 +43,17 @@ function addCard(data, onDelete, onLike, onImage, myId) {
     }
   });
   counter.textContent = data.likes.length;
-  cardElementDelete.addEventListener("click", (evt) => {
-    onDelete(evt, data._id);
-  });
+  
   cardElementLike.addEventListener("click", (evt) => {
     onLike(evt, data._id, counter);
   });
   cardElementImage.addEventListener("click", () => onImage(data));
   if (data.owner._id !== myId) {
     cardElement.querySelector(".card__delete-button").remove();
+  } else {
+    cardElementDelete.addEventListener("click", (evt) => {
+      onDelete(evt, data._id);
+    });
   }
 
   return cardElement;

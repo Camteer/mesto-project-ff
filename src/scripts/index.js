@@ -18,7 +18,7 @@ import {
   setCloseHandlers,
 } from "../components/modal.js";
 
-import { enableValidation } from "../components/validation.js";
+import { enableValidation, clearValidation } from "../components/validation.js";
 
 import {
   takeInfo,
@@ -28,15 +28,12 @@ import {
   myId,
   cardFromSercer,
 } from "./api.js";
-import { ContextExclusionPlugin } from "webpack";
 
 const logo = new URL("../images/logo.svg", import.meta.url);
 
 // Контейнер карточек
 
 const cardsContainer = document.querySelector(".places__list");
-
-
 
 // Формы
 
@@ -125,7 +122,7 @@ function safelyLoad(array, flag = false) {
 
 function handleProfileFormSubmit(evt) {
   evt.preventDefault();
-  console.log(evt.target)
+  console.log(evt.target);
   nameInput.textContent = formEdit.name.value;
   jobInput.textContent = formEdit.description.value;
   const load = evt.target.querySelector(".popup__button");
@@ -135,6 +132,7 @@ function handleProfileFormSubmit(evt) {
       load.textContent = "Сохранить";
     }
   });
+  clearValidation(evt.target);
   closePopup(evt.target.closest(".popup"));
 }
 
@@ -156,9 +154,9 @@ function handleAvatarSubmit(evt) {
   saveAvatar(link).then((res) => {
     if (res.ok) {
       load.textContent = "Сохранить";
-      
     }
   });
+  clearValidation(evt.target);
   closePopup(evt.target.closest(".popup"));
 }
 
@@ -181,8 +179,7 @@ function handleCardFormSubmit(evt) {
       load.textContent = "Сохранить";
     }
   });
-
-  
+  clearValidation(evt.target);
 }
 
 // Инициализация
@@ -193,6 +190,7 @@ function handleCardFormSubmit(evt) {
   document.querySelector(".logo").setAttribute("src", logo);
   safelyLoad([cardFromSercer(), myId()]);
   enableValidation();
+  setCloseHandlers();
 })();
 
 // Cлушатели
@@ -210,5 +208,3 @@ avatarButton.addEventListener("click", () => {
   openPopup(popupAvatar);
 });
 addCardButton.addEventListener("click", () => openPopup(popupAddCard));
-
-setCloseHandlers();
