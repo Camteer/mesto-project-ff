@@ -1,5 +1,3 @@
-import { clearValidation } from "../components/validation.js";
-
 // Функции открытия окна
 
 function openPopup(popup) {
@@ -29,15 +27,13 @@ function setCloseHandlers() {
   const popups = document.querySelectorAll(".popup");
   popups.forEach((popup) => {
     popup.classList.add("popup_is-animated");
+    console.log(popup)
     popup.addEventListener("mousedown", (evt) => {
       if (
         evt.target.classList.contains("popup_is-opened") ||
         evt.target.classList.contains("popup__close")
       ) {
         closePopup(popup);
-        if (!popup.classList.contains('popup_type_image')) {
-          clearValidation(popup.querySelector(".popup__form"));
-        }
       }
     });
   });

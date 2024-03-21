@@ -29,6 +29,15 @@ import {
   cardFromSercer,
 } from "./api.js";
 
+const settingsValidation = {
+  formSelector: ".popup__form",
+  inputSelector: ".popup__input",
+  submitButtonSelector: ".popup__button",
+  inactiveButtonClass: "form__submit_inactive",
+  inputErrorClass: "form__input_type_error",
+  errorClass: "form__input-error_active",
+};
+
 const logo = new URL("../images/logo.svg", import.meta.url);
 
 // Контейнер карточек
@@ -131,8 +140,9 @@ function handleProfileFormSubmit(evt) {
       load.textContent = "Сохранить";
     }
   });
-  clearValidation(evt.target);
+  clearValidation(evt.target, settingsValidation);
   closePopup(evt.target.closest(".popup"));
+  
 }
 
 //
@@ -155,7 +165,7 @@ function handleAvatarSubmit(evt) {
       load.textContent = "Сохранить";
     }
   });
-  clearValidation(evt.target);
+  clearValidation(evt.target, settingsValidation);
   closePopup(evt.target.closest(".popup"));
 }
 
@@ -178,7 +188,8 @@ function handleCardFormSubmit(evt) {
       load.textContent = "Сохранить";
     }
   });
-  clearValidation(evt.target);
+
+  clearValidation(evt.target, settingsValidation);
 }
 
 // Инициализация
@@ -188,7 +199,7 @@ function handleCardFormSubmit(evt) {
   takeInfo(nameInput, jobInput, avatarButton);
   document.querySelector(".logo").setAttribute("src", logo);
   safelyLoad([cardFromSercer(), myId()]);
-  enableValidation();
+  enableValidation(settingsValidation);
   setCloseHandlers();
 })();
 
@@ -198,12 +209,22 @@ formEdit.addEventListener("submit", handleProfileFormSubmit);
 formCard.addEventListener("submit", handleCardFormSubmit);
 formAvatar.addEventListener("submit", handleAvatarSubmit);
 editButton.addEventListener("click", () => {
+  clearValidation(profileForm, settingsValidation);
   formEdit.name.value = nameInput.textContent;
   formEdit.description.value = jobInput.textContent;
   openPopup(profileForm);
+  
 });
 
 avatarButton.addEventListener("click", () => {
+  formAvatar.reset();
   openPopup(popupAvatar);
+  clearValidation(popupAvatar, settingsValidation);
+  
 });
-addCardButton.addEventListener("click", () => openPopup(popupAddCard));
+addCardButton.addEventListener("click", () => {
+  formCard.reset()
+  openPopup(popupAddCard);
+  clearValidation(popupAddCard, settingsValidation);
+  
+});

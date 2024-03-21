@@ -41,11 +41,9 @@ const isValid = (formElement, inputElement, settings) => {
 
 const toggleButtonState = (inputList, buttonElement, settings) => {
   if (hasInvalidInput(inputList)) {
-    buttonElement.disabled = true;
-    buttonElement.classList.add(settings.inactiveButtonClass);
+    disableSubmitButton(buttonElement, settings, true)
   } else {
-    buttonElement.disabled = false;
-    buttonElement.classList.remove(settings.inactiveButtonClass);
+    disableSubmitButton(buttonElement, settings, false)
   }
 };
 
@@ -71,32 +69,36 @@ const setEventListeners = (formElement, settings) => {
   });
 };
 
-const enableValidation = (settings = settingsValidation) => {
+const disableSubmitButton = (button, settings, flag) => {
+  button.disabled = flag;
+  if (flag) {
+    button.classList.add(settings.inactiveButtonClass);
+  } else {
+    button.classList.remove(settings.inactiveButtonClass);
+  }
+  
+}
+
+const enableValidation = (settings) => {
   const arrayForm = Array.from(
     document.querySelectorAll(settings.formSelector)
   );
   arrayForm.forEach((formElement) => {
+
     setEventListeners(formElement, settings);
   });
 };
 
-const clearValidation = (formElement, settings = settingsValidation) => {
-  if (formElement.getAttribute("name") !== "edit-profile") {
-    formElement.reset();
-  }
+const clearValidation = (formElement, settings) => {
   const inputList = Array.from(
     formElement.querySelectorAll(settings.inputSelector)
   );
   const buttonElement = formElement.querySelector(
     settings.submitButtonSelector
   );
+  disableSubmitButton(buttonElement, settings, true)
   inputList.forEach((inputElement) => {
-    buttonElement.disabled = true;
-    buttonElement.classList.add(settings.inactiveButtonClass);
-    const errorElement = formElement.querySelector(`.${inputElement.id}-error`);
-    inputElement.classList.remove(settings.inputErrorClass);
-    errorElement.classList.remove(settings.errorClass);
-    errorElement.textContent = "";
+    hideInputError(formElement, inputElement, settings)
   });
 };
 
