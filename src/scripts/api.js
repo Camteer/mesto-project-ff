@@ -1,4 +1,4 @@
-function search(method, entity, objAtt, id = "") {
+function makeRequest(method, entity, objAtt, id = "") {
   return fetch(`https://nomoreparties.co/v1/wff-cohort-10/${entity}/${id}`, {
     method,
     headers: {
@@ -6,77 +6,40 @@ function search(method, entity, objAtt, id = "") {
       "Content-Type": "application/json",
     },
     body: JSON.stringify(objAtt),
-  });
-}
-
-function catchErr(err, res) {
-  return new Promise(function (resolve, reject) {
-    console.log("Запрос отклонён", err);
-    reject(res);
+  }).then((res) => {
+    if (res.ok) {
+      return res.json();
+    }
+    return Promise.reject(`Ошибка: ${res.status}`);
   });
 }
 
 function getInfo() {
-  return search("GET", "users/me").then((res) => {
-    if (res.ok) {
-      return res.json();
-    }
-    return catchErr(res.status, res.ok);
-  });
+  return makeRequest("GET", "users/me");
 }
 
 function saveAvatar(avatar) {
-  return search("PATCH", "users/me/avatar", { avatar }).then((res) => {
-    if (res.ok) {
-      return res.json();
-    }
-    return catchErr(res.status, res.ok);
-  });
+  return makeRequest("PATCH", "users/me/avatar", { avatar });
 }
 
 function saveInfo(name, about) {
-  return search("PATCH", "users/me", { name, about }).then((res) => {
-    if (res.ok) {
-      return res.json();
-    }
-    return catchErr(res.status, res.ok);
-  });
+  return makeRequest("PATCH", "users/me", { name, about });
 }
 
 function setCard(name, link) {
-  return search("POST", "cards", { name, link }).then((res) => {
-    if (res.ok) {
-      return res.json();
-    }
-    return catchErr(res.status, res.ok);
-  });
+  return makeRequest("POST", "cards", { name, link });
 }
 
 function deleteCard(cardId = "") {
-  return search("DELETE", "cards", {}, cardId).then((res) => {
-    if (res.ok) {
-      return true;
-    }
-    return catchErr(res.status, res.ok);
-  });
+  return makeRequest("DELETE", "cards", {}, cardId);
 }
 
 function putLike(id, method) {
-  return search(method, "cards/likes", {}, id).then((res) => {
-    if (res.ok) {
-      return true;
-    }
-    return catchErr(res.status, res.ok);
-  });
+  return makeRequest(method, "cards/likes", {}, id);
 }
 
 function getCards() {
-  return search("GET", "cards").then((res) => {
-    if (res.ok) {
-      return res.json();
-    }
-    return catchErr(res.status, res.ok);
-  });
+  return makeRequest("GET", "cards");
 }
 
 export {

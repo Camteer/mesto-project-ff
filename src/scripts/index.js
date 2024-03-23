@@ -78,47 +78,43 @@ function getImage(url) {
   });
 }
 
-function safelyLoad(array) {
-  return Promise.all(array).then((res) => {
-    const data = res[0];
-    const id = res[1]._id;
-    if (Array.isArray(data)) {
-      data.forEach((element) => {
-        getImage(element.link)
-          .then(() => {
-            cardsContainer.append(
-              createCard(
-                element,
-                handleDeleteCard,
-                handleLikeCard,
-                handleImageClick,
-                id
-              )
-            );
-          })
-          .catch((err) => {
-            console.log(err);
-          });
+function safetyLoad(array) {
+  const data = array[0];
+  const id = array[1];
+  (Array.isArray(data) ? data : [data]).forEach((element) => {
+    getImage(element.link)
+      .then(() => {
+        cardsContainer.append(
+          createCard(
+            element,
+            handleDeleteCard,
+            handleLikeCard,
+            handleImageClick,
+            id
+          )
+        );
+      })
+      .catch((err) => {
+        console.log(err);
       });
-    } else {
-      getImage(data.link)
-        .then(() => {
-          cardsContainer.prepend(
-            createCard(
-              data,
-              handleDeleteCard,
-              handleLikeCard,
-              handleImageClick,
-              id
-            )
-          );
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    }
   });
 }
+
+let userId;
+Promise.all([getCards(), getInfo()])
+  .then(([cards, userInfo]) => {
+    userId = userInfo._id;
+    safetyLoad([cards, userId]);
+    nameInput.textContent = userInfo.name;
+    jobInput.textContent = userInfo.about;
+    avatarButton.setAttribute(
+      "style",
+      `background-image: url(${userInfo.avatar})`
+    );
+  })
+  .catch((err) => {
+    console.log("Ошибка", err);
+  });
 
 // Функция возврата формы
 
@@ -140,18 +136,6 @@ function handleProfileFormSubmit(evt) {
       clearValidation(evt.target, settingsValidation);
     });
 }
-
-getInfo()
-  .then((data) => {
-    nameInput.textContent = data.name;
-    jobInput.textContent = data.about;
-    avatarButton.setAttribute("style", `background-image: url(${data.avatar})`);
-  })
-  .catch((err) => {
-    console.log(err);
-  });
-
-//
 
 function handleImageClick(data) {
   popupCardImage.setAttribute("src", data.link);
@@ -196,7 +180,7 @@ function handleCardFormSubmit(evt) {
   load.textContent = "Сохранение...";
   setCard(data.name, data.link)
     .then((card) => {
-      safelyLoad([card, getInfo()]);
+      safetyLoad([card, userId]);
     })
     .catch((err) => {
       console.log("Ошибка", err);
@@ -212,9 +196,6 @@ function handleCardFormSubmit(evt) {
 
 (function () {
   document.querySelector(".logo").setAttribute("src", logo);
-  safelyLoad([getCards(), getInfo()]).catch((err) => {
-    console.log("Ошибка", err);
-  });
   enableValidation(settingsValidation);
   setCloseHandlers();
 })();
